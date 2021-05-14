@@ -1,67 +1,39 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
-void empaquetamiento(char *cadena, int *arreglo)
+void pack(char *buffer, int *out)
 {
-    printf("Entrada: %s \n",cadena);
-    int charCounter = 1;
-    char numberStart = cadena[0];
-    while(*cadena != '\0')
+    for (int i = 0; i < strlen(buffer); i++)
     {
-        char currentChar = cadena[0];
-        *arreglo |= currentChar; 
-        if(1!=charCounter && 0==charCounter%4)
-        {
-            arreglo++;
-            numberStart = cadena[1];
-        }
-        else
-        {
-            *arreglo <<= 8;
-            if(cadena[1] =='\0')
-                {
-                    while(*arreglo <= 0x00FFFFFF)
-                    {
-                        *arreglo <<= 8;
-                    }
-                }
-        }
-        charCounter++;
-        cadena++;
+        int offset = 8 * (3 - i);
+        out[i / 4] += buffer[i] << offset;
     }
 }
 
-int main(){
+int main()
+{
+    char buffer[101];
 
-    char cadena[100];
+    printf("Ingrese texto(maximo 100 caracteres):\n");
+    scanf("%s", buffer);
 
-    printf("ingrese cadena: ");
-    scanf("%s", &cadena);
+    size_t buffer_size = strlen(buffer);
 
-    int charCounter = 0;
+    int m_packer_size = ceil(buffer_size / 4.0);
 
-    while(cadena[charCounter]!=0)
+    int *buffer_packer = calloc(m_packer_size, sizeof(int));
+
+    pack(buffer, buffer_packer);
+
+    for (int i = 0; i < m_packer_size; i++)
     {
-        charCounter++;
+        printf("0x%X ", buffer_packer[i]);
     }
 
-    int *arrayPointer;
+    free(buffer_packer);
 
-    arrayPointer = calloc(charCounter, sizeof(char));
-
-    char * charpointer = &cadena[0];
-
-    empaquetamiento(charpointer, arrayPointer);
-
-    int positionsNeeded = (charCounter%4 != 0)? (charCounter/4)+1 :charCounter/4 ;
-
-    printf("Salida: ");
-    int i = 0;
-    for (; i < positionsNeeded-1; i++)
-    {
-        printf("0x%X, ",arrayPointer[i]);
-    }
-    printf("0x%X",arrayPointer[i]);
-    printf("\n");
     return 0;
+}turn 0;
 }
